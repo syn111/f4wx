@@ -1,0 +1,3 @@
+[submodule "dependencies/g2c"]
+	path = dependencies/g2c
+	url = https://github.com/NOAA-EMC/NCEPLIBS-g2c.git

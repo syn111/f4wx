@@ -1,0 +1,7 @@
+# Normalize line endings
+* text=auto
+
+# Merge as binary so VS doesn't break project/solution files
+*.sln     merge=binary
+*.vcxproj merge=binary
+*.vcproj  merge=binary

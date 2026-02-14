@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Test|x64">
+      <Configuration>Test</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Test-Public|x64">
+      <Configuration>Test-Public</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{12368C47-572D-4E2E-95CB-B61E1D7E58FB}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>g2c</RootNamespace>
+    <ProjectName>g2c</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test-Public|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\obj\$(Configuration)\g2c\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\obj\$(Configuration)\g2c\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\obj\$(Configuration)\g2c\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test-Public|x64'">
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\obj\$(Configuration)\g2c\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\g2c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\g2c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\g2c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test-Public|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..\g2c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\g2c\src\cmplxpack.c" />
+    <ClCompile Include="..\g2c\src\compack.c" />
+    <ClCompile Include="..\g2c\src\comunpack.c" />
+    <ClCompile Include="..\g2c\src\drstemplates.c" />
+    <ClCompile Include="..\g2c\src\g2_addfield.c" />
+    <ClCompile Include="..\g2c\src\g2_addgrid.c" />
+    <ClCompile Include="..\g2c\src\g2_addlocal.c" />
+    <ClCompile Include="..\g2c\src\g2_create.c" />
+    <ClCompile Include="..\g2c\src\g2_free.c" />
+    <ClCompile Include="..\g2c\src\g2_getfld.c" />
+    <ClCompile Include="..\g2c\src\g2_gribend.c" />
+    <ClCompile Include="..\g2c\src\g2_info.c" />
+    <ClCompile Include="..\g2c\src\g2_miss.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack1.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack2.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack3.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack4.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack5.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack6.c" />
+    <ClCompile Include="..\g2c\src\g2_unpack7.c" />
+    <ClCompile Include="..\g2c\src\gbits.c" />
+    <ClCompile Include="..\g2c\src\getdim.c" />
+    <ClCompile Include="..\g2c\src\getpoly.c" />
+    <ClCompile Include="..\g2c\src\gridtemplates.c" />
+    <ClCompile Include="..\g2c\src\int_power.c" />
+    <ClCompile Include="..\g2c\src\misspack.c" />
+    <ClCompile Include="..\g2c\src\mkieee.c" />
+    <ClCompile Include="..\g2c\src\pack_gp.c" />
+    <ClCompile Include="..\g2c\src\pdstemplates.c" />
+    <ClCompile Include="..\g2c\src\rdieee.c" />
+    <ClCompile Include="..\g2c\src\reduce.c" />
+    <ClCompile Include="..\g2c\src\seekgb.c" />
+    <ClCompile Include="..\g2c\src\simpack.c" />
+    <ClCompile Include="..\g2c\src\simunpack.c" />
+    <ClCompile Include="..\g2c\src\specpack.c" />
+    <ClCompile Include="..\g2c\src\specunpack.c" />
+    <ClCompile Include="..\g2c\src\util.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="grib2.h" />
+    <ClInclude Include="..\g2c\src\grib2_int.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

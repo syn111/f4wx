@@ -1,0 +1,100 @@
+v2.0.0 (14-FEB-2026)
+--------------------
+ * Open-source release. The source code is now available at https://github.com/syn111/f4wx
+ * Rebuilt as a 64-bit (x64) application; solution and main project are x64-only (Win32/x86 configurations removed)
+ * Improved contrail formation level calculation (latitude-aware; more accurate for different regions)
+ * Improved pressure contour overlay (fixed artifacts; added H/L depiction)
+ * Updated to FMAP version 8 (BMS 4.36+)
+ * Implemented parallel downloads (faster NOAA GRIB downloads)
+ * Replaced updater with simple update notifier
+ * Replaced external data files with built-in theater presets
+ * Replaced ecCodes with NCEPLIBS-g2c
+ * Removed other no longer needed dependencies
+ * Version numbering now uses major.minor.revision (e.g. 2.0.0)
+
+(1.x and earlier below)
+
+v1.05 (Build 57)
+----------------
+ * Fixes for new NOAA server path structure and GRIB file contents
+
+
+v1.04 (Build 56)
+----------------
+ * Changed all references to BMS 4.34 to BMS 4.35
+ * Fixed issues with updater
+
+
+v1.03 (Build 55)
+----------------
+ * Bugfix on preview save
+
+
+v1.02 (Build 54)
+----------------
+ * Changed preview folder name to follow BMS name convention
+ * Made compatible with the new NOAA server file structure (13 June)
+
+
+v1.01 (Build 53)
+----------------
+ * Improved (but not guaranteed) compatibility with older versions of Windows
+
+
+v1.0 (Build 52)
+---------------
+ * Program is now compatible with BMS 4.34 (only)
+ * Fixed bug in timezone sync
+ * Fixed various cosmetic bugs in the UI
+
+
+v1.0 Beta (Build 49)
+--------------------
+ * Fixed compatibility with NOAA SSL web server
+
+
+v1.0 Beta (Build 47)
+--------------------
+ * Fixed GFS list parse error
+
+
+v1.0 Beta (Build 41)
+--------------------
+* Possible security issue on updater fixed
+
+
+v1.0 Beta (Build 40)
+--------------------
+* Added confirmation question when loading data from different geographical areas than the selected theater
+* Changed style of error/info messages
+* QNH/Wind/Etc text updates during animation play if mouse on preview area
+* Preview image can now be saved (right click over preview area)
+* Custom image can now be loaded as preview background for custom theater preset (right click over preview area)
+* Recoded worker/UI thread synchronization
+* Upgraded from ECMWF GRIB API library to customized ECMWF ecCodes 2.5.0 library
+* Changed GFS download list contents to a more user-friendly format
+* Fractional timezones now possible (for theaters in half-hour timezones). Range increased to -12h to +14h
+* Added option to batch-save all preview options when generating a FMAP sequence. For now:
+	- The preview images are saved in the 'preview' subdirectory of the folder chosen to save the FMAPs
+	- The images are fixed size of 350x350 (same than in the program)
+	- The fields currently selected in the UI (temperature, winds...) are drawn in the preview images
+* Added auto-updater. Notifies about new program versions and can also download data updates (theater presets/GRIB definitions) on user approval
+* Memory usage greatly reduced (internal fmaps are now generated 'on demand')
+* Added crash handler to generate minidump file for crash reports
+
+
+v1.0 Beta (Build 39)
+--------------------
+ * Corrected position of the 'Poor' inclement precipitation text
+ * Fixed Initial Time showing invalid inputs even though they had been truncated internally
+ * Fixed starting day being always 1 on generated .fmap regardless of selection (Initial Day option was being ignored)
+ * Save From Current option renamed to Start From Current and enforces the current previewed position as the initial BMS position
+ * Loading weather data from local GRIB files with different dates or from different geographical areas will show an error
+ * Timezone sync now works with locally loaded GRIB files
+ * Added warning when selected options prevent timezone sync from correctly syncing time
+
+
+v1.0 Beta (Build 38)
+--------------------
+
+ * Initial public BETA release

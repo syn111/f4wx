@@ -1,0 +1,138 @@
+F4Wx v2.0.0
+===========
+
+
+  ______ _  ___          __     
+ |  ____| || \ \        / /     
+ | |__  | || |\ \  /\  / /_  __ 
+ |  __| |__   _\ \/  \/ /\ \/ / 
+ | |       | |  \  /\  /  >  <  
+ |_|       |_|   \/  \/  /_/\_\ 
+ (c) Ahmed 2016-2026
+
+
+
+CONTENTS OF THIS FILE
+---------------------
+   
+ * Introduction
+ * Requirements
+ * Installation
+ * FAQ
+ * Bug reporting
+ * Disclaimer
+
+
+
+INTRODUCTION
+------------
+
+F4Wx is a real weather tool for BMS 4.36+ that allows the user to download, tweak and convert real weather into the simulator in a user-friendly way.
+
+* For questions about the program, submission of bug reports and feature suggestions visit the release thread on the BMS Community MODs/WIP forum.
+
+
+
+REQUIREMENTS
+------------
+
+This program requires Windows 7 or Windows Server 2008 R2 or later.
+
+This program requires the following packages:
+
+ * Visual C++ Redistributable (x64) – the standard VC runtime (vcredist). Use the latest supported 2015–2022 package: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
+
+
+
+INSTALLATION
+------------
+ 
+ * Extract ALL the contents of this compressed file to your folder of choice.
+ * To launch the program simply execute F4Wx.exe
+
+
+
+FAQ
+---
+
+Q: I get a message saying that MSVCP140.DLL is missing from my computer
+
+A: You didn't follow the instructions above, specifically the one regarding the Visual C++ Redistributable (vcredist). Download and install the x64 version from the link in the Requirements section (vc_redist.x64.exe).
+
+
+Q: Where do I put the generated .fmap files?
+
+A: Single files go into your campaign directory and you must load them manually from BMS. Sequences go into the WeatherMapsUpdates directory inside the campaign folder and get loaded by BMS at their appropriate time during the campaign
+
+
+Q: Do I have to put the first file of the sequence in a different folder?
+
+A: Reportedly if your campaign starts at 05:00 BMS will not load the first (10500.fmap) file automatically from the WeatherMapsUpdates directory. You may either move that file manually, or better yet select 05:01 (real campaign start +1 minute) as start time in F4Wx and forget about this issue
+
+
+Q: Is this compatible with Windows XX?
+
+A: F4Wx has been tested with Windows 7 and Windows 10. Minimum required Windows Version is Windows 7 or Windows Server 2008 R2. Windows XP and Windows Vista are NOT supported.
+
+
+Q: I don't know what X control does
+
+A: Most of the not-so-intuitive controls include tooltips that describe their functionalities. Hover the mouse over the control to have the tooltip appear. If in doubt, don't touch.
+
+
+Q: I get a "Error downloading file index" message
+
+A: Because of the way NOAA publishes the GFS forecast data, there is a variable time period (usually around 1 hour) between the first time the GFS run shows in the GFS selector list, and the time when all the data required by F4Wx is available for download. To avoid this error message just choose a prior GFS run from the GFS selector list
+
+
+Q: Can I load GRIB version 1 files or can use old zyGrib files that I used on Grb2Fmap?
+
+A: As of this version GRIB 1 files downloaded from zyGrib don't work on F4Wx. Use GRIB 2 downloaded from within the application or saved from NOAA NOMADS server
+
+
+Q: I am developing X theater and would like to have its preset included in the tool
+
+A: Get in touch with me when your theater is nearing public release and I will gladly add it
+
+
+Q: For some inexplicable reason I have set the interval to 1 minute and loaded 124871208741204 weather files and the application has crashed
+
+A: You have run out of memory (e.g. very large sequence). Try a smaller time range or interval.
+
+
+Q: I get a message prompting me to download an updated version and the application quits afterwards
+
+A: The application checks for newer versions. If an update is available you will be notified; you can download it from the release thread or the project repository. Keeping up to date is recommended.
+
+
+Q: Can the auto-updater harm my computer/OS?
+
+A: The auto-updater is coded to only be able to modify the contents of your F4Wx install folder. In any case, the disclaimer at the bottom of this README applies
+
+
+Q: I hear that BMS has different wind layers. Can I select which one to preview in the preview map of F4Wx?
+
+A: Yes. Press SHIFT while clicking on the wind select checkbox and a popup window will let you select the layer to visualize.
+
+
+
+BUG REPORTING
+-------------
+
+Report the bugs via private message, in the release thread in the Community MODs/WIP section of the BMS forum, or via e-mail. Make sure to describe:
+
+ * What weather data you were using (what GFS run)
+ * What options you had selected in the program (preferably with a picture)
+ * Any other information to consistenly reproduce the problem
+ * IMPORTANT: If you are reporting a crash please include the minidump file as generated by the program
+
+
+
+DISCLAIMER
+----------
+
+THIS PROGRAM IS PROVIDED 'AS IS' WITHOUT ANY GUARANTEES OR WARRANTY. 
+IN ASSOCIATION WITH THE PRODUCT, THE AUTHOR MAKES NO WARRANTEES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OF TITLE, OR OF NONINFRINGEMENT OF THIRD PARTY RIGHTS. 
+IN NO EVENT SHALL THE AUTHOR OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+USE OF THE PRODUCT BY A USER IS AT THE USER'S RISK.
+

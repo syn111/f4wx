@@ -1,0 +1,11 @@
+F4Wx
+Copyright 2016-2026 Ahmed
+Licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+This product includes or links to the following third-party software:
+
+- NCEPLIBS-g2c (dependencies/g2c/)
+  Copyright 2023-2024 UCAR/NCAR and NOAA.
+  Licensed under the Apache License, Version 2.0.
+  https://github.com/NOAA-EMC/NCEPLIBS-g2c
