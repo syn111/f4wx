@@ -17,9 +17,9 @@ For questions, bug reports, and feature suggestions, see the release thread on t
 
 ## Credits and copyright
 
-F4Wx is Copyright 2016–2026 **Ahmed**.
+F4Wx is Copyright 2016–2026 **[syn111](https://github.com/syn111)** (Callsign: Ahmed).
 
-This repository includes third-party code. See [NOTICE](NOTICE) for a list of components and their licenses.
+This repository includes third-party code; see [NOTICE](NOTICE) for a list of components and their licenses.
 
 ---
 

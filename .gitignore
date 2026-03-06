@@ -166,3 +166,4 @@ __pycache__/
 # F4Wx-specific
 data/*.dat
 src/f4wx/version.h
+/.cursor/
