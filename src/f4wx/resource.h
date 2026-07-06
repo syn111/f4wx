@@ -111,6 +111,7 @@
 #define IDC_F4WX_MAIN_MINUTE                    1036
 #define IDC_F4WX_MAIN_WARN_TIMEZONE             1037
 #define IDC_F4WX_MAIN_WARN_START                1038
+#define IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD      1039
 
 // Legacy aliases (same control as above)
 #define IDC_F4WX_THEATER_SELECTOR               IDC_F4WX_MAIN_THEATER_SELECTOR

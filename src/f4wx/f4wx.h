@@ -233,6 +233,7 @@ private:
 	bool m_ui_sync_with_real = true;
 	bool m_ui_start_from_current = false;
 	bool m_ui_save_previews = false;
+	bool m_ui_for_volumetric_cloud = true;
 
 	inline int messagebox(const char *title, const char *msg, int flags = 0) {
 		std::wstring wtitle = to_wide(title);
@@ -329,6 +330,7 @@ private:
 
 	void ui_set_sync_timezone(bool val);
 	void ui_set_start_current(bool val);
+	void ui_set_for_volumetric_cloud(bool val);
 
 	void ui_set_save_previews(bool val);
 

@@ -520,6 +520,14 @@ void f4wx::ui_set_start_current(bool val)
 	set_current_fmap(m_current_map_idx, true);
 }
 
+void f4wx::ui_set_for_volumetric_cloud(bool val)
+{
+	m_ui_for_volumetric_cloud = val;
+	m_converter_options.linear_cloud_density_for_volumetric = val;
+	CheckDlgButton(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD, val);
+	set_current_fmap(m_current_map_idx, true);
+}
+
 void f4wx::ui_set_save_previews(bool val)
 {
 	m_ui_save_previews = val;
@@ -618,6 +626,9 @@ void f4wx::initialize_controls()
 	ui_set_sync_timezone(false);
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE), L"Adjust FMAP generation so that local-time in BMS matches real-time of the forecast.");
 
+	ui_set_for_volumetric_cloud(true);
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD), L"Use linear cloud density mapping (1-13) for volumetric cloud rendering.");
+
 	ui_set_start_current(false);
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_START_CURRENT), L"Start sequence from the currently previewed position.");
 
@@ -671,6 +682,9 @@ void f4wx::set_save_mode(ui_save_mode mode)
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE);
+	EnableWindow(hdlg, mode == ui_save_mode::sequence);
+
+	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_START_CURRENT);
@@ -747,6 +761,10 @@ INT_PTR f4wx::on_command(WPARAM wparam, LPARAM lparam)
 
 		case IDC_F4WX_MAIN_START_CURRENT:
 			ui_set_start_current(!m_ui_start_from_current);
+			break;
+
+		case IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD:
+			ui_set_for_volumetric_cloud(!m_ui_for_volumetric_cloud);
 			break;
 
 		case IDC_F4WX_MAIN_SAVE_PREVIEWS:

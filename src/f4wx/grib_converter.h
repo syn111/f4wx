@@ -64,6 +64,8 @@ enum bms_density : int {
 	BMS_DENSITY_OVERCAST = 13
 };
 
+inline constexpr float TCC_BAND_OFFSET = 10.0f;		/* legacy discrete band offset for tcc2density */
+
 /* Fallback cumulus base when no cloud in cell: temp range (deg C) */
 inline constexpr float GC_CUMULUS_FALLBACK_TEMP_MIN_C = -20.0f;
 inline constexpr float GC_CUMULUS_FALLBACK_TEMP_MAX_C = 50.0f;
@@ -84,6 +86,7 @@ struct grib_converter_options {
 	float precipitation_inclement;
 	unsigned long interval_minutes;
 	unsigned long max_forecast_hours;
+	bool linear_cloud_density_for_volumetric;
 };
 
 /** Owning container for a sequence of fmaps (one per time step). */
