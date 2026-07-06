@@ -56,14 +56,13 @@ inline constexpr float BMS_CUMULUS_THICKNESS_MIN_FT = 2500.0f;	/* humilis (size 
 inline constexpr float BMS_CUMULUS_THICKNESS_MAX_FT = 11000.0f;	/* congestus (size 0) */
 inline constexpr float BMS_CUMULUS_SIZE_INDEX_MAX = 5.0f;
 
-/** BMS cloud density indices (1, 5, 9, 13). Implicitly converts to int for fmap/APIs. */
+/** BMS cloud density anchor indices used for weather-type minimum limits. */
 enum bms_density : int {
 	BMS_DENSITY_FEW = 1,
 	BMS_DENSITY_SCATTERED = 5,
 	BMS_DENSITY_BROKEN = 9,
 	BMS_DENSITY_OVERCAST = 13
 };
-inline constexpr float TCC_BAND_OFFSET = 10.0f;		/* for tcc2density band index: (tcc + TCC_BAND_OFFSET) * ... / 100 */
 
 /* Fallback cumulus base when no cloud in cell: temp range (deg C) */
 inline constexpr float GC_CUMULUS_FALLBACK_TEMP_MIN_C = -20.0f;

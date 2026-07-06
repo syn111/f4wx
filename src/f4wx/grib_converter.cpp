@@ -764,20 +764,18 @@ inline float thickness2size(float thickness) {
 
 /**
  * Maps total cloud cover (TCC) to BMS cumulus density index.
- * BMS density 1 = few, 13 = overcast. We use four bands (1, 5, 9, 13) from
- * TCC percent; the size parameter is reserved for future use.
+ * BMS density 1 = few, 13 = overcast. Uses linear mapping from TCC percent
+ * to integer density range [1, 13].
  * @param tcc Total cloud cover 0-100.
  * @param size BMS cumulus size (unused; reserved for future TCC/size interaction).
- * @return BMS density index in { 1, 5, 9, 13 }.
+ * @return BMS density index in [1, 13].
  */
 inline int tcc2density(float tcc, float size) {
 	(void)size;
-	static constexpr bms_density densities[] = { BMS_DENSITY_FEW, BMS_DENSITY_SCATTERED, BMS_DENSITY_BROKEN, BMS_DENSITY_OVERCAST };
-	constexpr int num = static_cast<int>(std::size(densities));
 	float clamped = std::clamp(tcc, 0.f, 100.f);
-	int i = static_cast<int>(((clamped + TCC_BAND_OFFSET) * (num - 1)) / 100);
-	i = std::clamp(i, 0, num - 1);
-	return densities[i];
+	float normalized = clamped / 100.0f;
+	float mapped = static_cast<float>(BMS_DENSITY_FEW) + normalized * static_cast<float>(BMS_DENSITY_OVERCAST - BMS_DENSITY_FEW);
+	return std::clamp(static_cast<int>(std::lround(mapped)), static_cast<int>(BMS_DENSITY_FEW), static_cast<int>(BMS_DENSITY_OVERCAST));
 }
 
 /** Running average: add samples with add(), read current average with get() or operator T. */
