@@ -56,7 +56,7 @@ inline constexpr float BMS_CUMULUS_THICKNESS_MIN_FT = 2500.0f;	/* humilis (size 
 inline constexpr float BMS_CUMULUS_THICKNESS_MAX_FT = 11000.0f;	/* congestus (size 0) */
 inline constexpr float BMS_CUMULUS_SIZE_INDEX_MAX = 5.0f;
 
-/** BMS cloud density anchor indices used for weather-type minimum limits. */
+/** BMS cloud density indices (1, 5, 9, 13). Implicitly converts to int for fmap/APIs. */
 enum bms_density : int {
 	BMS_DENSITY_FEW = 1,
 	BMS_DENSITY_SCATTERED = 5,
