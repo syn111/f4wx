@@ -1,3 +1,8 @@
+v2.1.0 (06-JUL-2026)
+--------------------
+ * Added "For Volumetric Cloud" option in Save Weather (default on): linear cloud-density mapping (1-13) for volumetric cloud rendering; uncheck for legacy 4-band mapping
+ * Thanks to chihirobelmo (https://github.com/chihirobelmo) for the contribution
+
 v2.0.0 (14-FEB-2026)
 --------------------
  * Open-source release. The source code is now available at https://github.com/syn111/f4wx
