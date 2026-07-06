@@ -684,9 +684,6 @@ void f4wx::set_save_mode(ui_save_mode mode)
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
-	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD);
-	EnableWindow(hdlg, mode == ui_save_mode::sequence);
-
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_START_CURRENT);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
