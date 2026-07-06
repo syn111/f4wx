@@ -764,17 +764,25 @@ inline float thickness2size(float thickness) {
 
 /**
  * Maps total cloud cover (TCC) to BMS cumulus density index.
- * BMS density 1 = few, 13 = overcast. We use four bands (1, 5, 9, 13) from
- * TCC percent; the size parameter is reserved for future use.
+ * BMS density 1 = few, 13 = overcast.
+ * If linear_mode is true, maps TCC linearly to [1, 13].
+ * Otherwise uses legacy four-band mapping {1, 5, 9, 13}.
  * @param tcc Total cloud cover 0-100.
  * @param size BMS cumulus size (unused; reserved for future TCC/size interaction).
- * @return BMS density index in { 1, 5, 9, 13 }.
+ * @param linear_mode True for linear 1-13 mapping, false for legacy 4-band mapping.
+ * @return BMS density index in [1, 13].
  */
-inline int tcc2density(float tcc, float size) {
+inline int tcc2density(float tcc, float size, bool linear_mode) {
 	(void)size;
+	float clamped = std::clamp(tcc, 0.f, 100.f);
+	if (linear_mode) {
+		float normalized = clamped / 100.0f;
+		float mapped = static_cast<float>(BMS_DENSITY_FEW) + normalized * static_cast<float>(BMS_DENSITY_OVERCAST - BMS_DENSITY_FEW);
+		return std::clamp(static_cast<int>(std::lround(mapped)), static_cast<int>(BMS_DENSITY_FEW), static_cast<int>(BMS_DENSITY_OVERCAST));
+	}
+
 	static constexpr bms_density densities[] = { BMS_DENSITY_FEW, BMS_DENSITY_SCATTERED, BMS_DENSITY_BROKEN, BMS_DENSITY_OVERCAST };
 	constexpr int num = static_cast<int>(std::size(densities));
-	float clamped = std::clamp(tcc, 0.f, 100.f);
 	int i = static_cast<int>(((clamped + TCC_BAND_OFFSET) * (num - 1)) / 100);
 	i = std::clamp(i, 0, num - 1);
 	return densities[i];
@@ -936,7 +944,7 @@ int grib_converter::convert_single(grib_converter_options& o, fmap& map, unsigne
 					: cumulus_layer.base);
 
 				float cumulusSize = thickness2size(cumulus_layer.top - cumulus_layer.base);
-				int cumulusDensity = tcc2density(cumulus_layer.tcc, cumulusSize);
+				int cumulusDensity = tcc2density(cumulus_layer.tcc, cumulusSize, o.linear_cloud_density_for_volumetric);
 
 				// BMS limits
 				if (wxtype >= WX_POOR) {
