@@ -25,29 +25,28 @@ namespace {
 
 	// Order must match resource.rc theater RCDATA entries and IDB_THEATER_* in resource.h.
 	constexpr std::array<theater_def, 16> s_theaters = {{
-		{ "Korea",   64,    540, 43.f, 34.f, 123.f, 132.f, IDB_THEATER_KOREA },
-		{ "Aegean",  64,    120, 43.f, 33.f,  21.f,  34.f, IDB_THEATER_AEGEAN },
-		{ "Balkans", 64,    120, 46.f, 37.f,  11.f,  20.f, IDB_THEATER_BALKANS },
-		{ "EMF",     128,   120, 47.f, 29.f,  17.f,  39.f, IDB_THEATER_EMF },
-		{ "HTO",     64,    120, 42.f, 33.f,  19.f,  31.f, IDB_THEATER_HTO },
-		{ "Israel",  64,    120, 35.f, 25.f,  30.f,  40.f, IDB_THEATER_ISRAEL },
-		{ "Kurile",  64,    660, 52.f, 42.f, 138.f, 150.f, IDB_THEATER_KURILE },
-		{ "Kuwait",  64,    180, 34.f, 25.f,  43.f,  52.f, IDB_THEATER_KUWAIT },
-		{ "MidEast", 128,   180, 39.f, 20.f,  37.f,  57.f, IDB_THEATER_MIDEAST },
-		{ "Nevada",  64,   -540, 43.f, 33.f,-121.f,-109.f, IDB_THEATER_NEVADA },
-		{ "Nordic",  64,    120, 72.f, 63.f,  11.f,  34.f, IDB_THEATER_NORDIC },
-		{ "Ostsee",  64,    120, 61.f, 52.f,   4.f,  20.f, IDB_THEATER_OSTSEE },
-		{ "Panama",  64,   -300, 13.f,  3.f, -85.f, -76.f, IDB_THEATER_PANAMA },
-		{ "POH",     128,    60, 44.f, 26.f, -20.f,   4.f, IDB_THEATER_POH },
-		{ "Taiwan",  64,    480, 30.f, 20.f, 115.f, 125.f, IDB_THEATER_TAIWAN },
-		{ "Vietnam", 128,   420, 26.f,  8.f,  96.f, 114.f, IDB_THEATER_VIETNAM },
+		{ "Korea",   64,  43.f, 34.f, 123.f, 132.f, IDB_THEATER_KOREA },
+		{ "Aegean",  64,  43.f, 33.f,  21.f,  34.f, IDB_THEATER_AEGEAN },
+		{ "Balkans", 64,  46.f, 37.f,  11.f,  20.f, IDB_THEATER_BALKANS },
+		{ "EMF",     128, 47.f, 29.f,  17.f,  39.f, IDB_THEATER_EMF },
+		{ "HTO",     64,  42.f, 33.f,  19.f,  31.f, IDB_THEATER_HTO },
+		{ "Israel",  64,  35.f, 25.f,  30.f,  40.f, IDB_THEATER_ISRAEL },
+		{ "Kurile",  64,  52.f, 42.f, 138.f, 150.f, IDB_THEATER_KURILE },
+		{ "Kuwait",  64,  34.f, 25.f,  43.f,  52.f, IDB_THEATER_KUWAIT },
+		{ "MidEast", 128, 39.f, 20.f,  37.f,  57.f, IDB_THEATER_MIDEAST },
+		{ "Nevada",  64,  43.f, 33.f,-121.f,-109.f, IDB_THEATER_NEVADA },
+		{ "Nordic",  64,  72.f, 63.f,  11.f,  34.f, IDB_THEATER_NORDIC },
+		{ "Ostsee",  64,  61.f, 52.f,   4.f,  20.f, IDB_THEATER_OSTSEE },
+		{ "Panama",  64,  13.f,  3.f, -85.f, -76.f, IDB_THEATER_PANAMA },
+		{ "POH",     128, 44.f, 26.f, -20.f,   4.f, IDB_THEATER_POH },
+		{ "Taiwan",  64,  30.f, 20.f, 115.f, 125.f, IDB_THEATER_TAIWAN },
+		{ "Vietnam", 128, 26.f,  8.f,  96.f, 114.f, IDB_THEATER_VIETNAM },
 	}};
 
 	static void fill_theater_data(const theater_def& def, f4wx_theater_data* result)
 	{
 		assert(result != nullptr);
 		result->name = def.name;
-		result->timezone = def.timezone;
 		result->size = static_cast<WORD>(def.size);
 		result->tlat = def.tlat;
 		result->blat = def.blat;

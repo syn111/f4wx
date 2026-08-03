@@ -502,10 +502,10 @@ void f4wx::ui_set_bms_minute(int val)
 	set_current_fmap(m_current_map_idx, true);
 }
 
-void f4wx::ui_set_sync_timezone(bool val)
+void f4wx::ui_set_sync_real_time(bool val)
 {
 	m_ui_sync_with_real = val;
-	CheckDlgButton(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE, val);
+	CheckDlgButton(m_hwnd, IDC_F4WX_MAIN_SYNC_REAL_TIME, val);
 	set_current_fmap(m_current_map_idx, true);
 	if (val == false)
 		show_warning(IDC_F4WX_MAIN_WARN_SYNC, false);
@@ -626,8 +626,8 @@ void f4wx::initialize_controls()
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SAVE_SINGLE), L"Save only the currently previewed weather.");
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SAVE_SEQUENCE), L"Save a sequence of files according to the parameters below.");
 
-	ui_set_sync_timezone(false);
-	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE), L"Skip forecast steps so GRIB UTC matches BMS Zulu Initial Time.");
+	ui_set_sync_real_time(false);
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_REAL_TIME), L"Skip forecast steps so GRIB UTC matches BMS Zulu Initial Time.");
 
 	ui_set_for_volumetric_cloud(true);
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD), L"Use linear cloud density mapping (1-13) for volumetric cloud rendering.");
@@ -684,7 +684,7 @@ void f4wx::set_save_mode(ui_save_mode mode)
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_MINUTE);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
-	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE);
+	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_REAL_TIME);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_START_CURRENT);
@@ -755,8 +755,8 @@ INT_PTR f4wx::on_command(WPARAM wparam, LPARAM lparam)
 			}
 			break;
 
-		case IDC_F4WX_MAIN_SYNC_TIMEZONE:
-			ui_set_sync_timezone(!m_ui_sync_with_real);
+		case IDC_F4WX_MAIN_SYNC_REAL_TIME:
+			ui_set_sync_real_time(!m_ui_sync_with_real);
 			break;
 
 		case IDC_F4WX_MAIN_START_CURRENT:
@@ -1179,7 +1179,7 @@ INT_PTR f4wx::on_hotkey(WPARAM wparam, LPARAM lparam)
 void f4wx::set_current_fmap(size_t pos, bool override)
 {
 	if ((override || pos != m_current_map_idx) && pos < get_fmap_count()) {
-		correct_for_timezone_sync(pos);
+		correct_for_real_time_sync(pos);
 		m_current_map_idx = pos;
 
 		if (!m_current_map || (m_current_map->get_sizeY() != fmap_cells_from_size(m_current_theater.size) || m_current_map->get_sizeX() != fmap_cells_from_size(m_current_theater.size))) {
@@ -1971,7 +1971,7 @@ INT_PTR f4wx::on_paint(HWND hwnd)
 	return 0;
 }
 
-void f4wx::correct_for_timezone_sync(size_t &pos)
+void f4wx::correct_for_real_time_sync(size_t &pos)
 {
 	size_t minpos = get_sync_min_pos();
 	if (pos < minpos)
@@ -2117,9 +2117,6 @@ f4wx_custom::f4wx_custom(HWND hparent, f4wx_theater_data &data)
 {
 	init_dialog(IDD_F4WX_CUSTOM, hparent);
 
-	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE, data.timezone/60.0f, L"{:+2.2f}");
-	SendDlgItemMessage(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE, EM_SETLIMITTEXT, 7, 0);
-
 	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_BLAT, data.blat, L"{:+02.2f}");
 	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_TLAT, data.tlat, L"{:+02.2f}");
 	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_RLON, data.rlon, L"{:+03.2f}");
@@ -2147,7 +2144,6 @@ INT_PTR CALLBACK f4wx_custom::dialog_proc(HWND hwnd, UINT msg, WPARAM wparam, LP
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_BLAT), L"Enter theater bottommost latitude. (+N/-S)");
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_LLON), L"Enter theater leftmost longitude. (+E/-W)");
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_RLON), L"Enter theater rightmost longitude. (+E/-W)");
-			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_TIMEZONE), L"Enter theater timezone.");
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_THEATER_SIZE), L"Enter theater segment size. (default: 64)");
 
 			break;
@@ -2167,14 +2163,6 @@ INT_PTR CALLBACK f4wx_custom::dialog_proc(HWND hwnd, UINT msg, WPARAM wparam, LP
 				case IDCANCEL:
 					on_close(false);
 					return TRUE;
-
-				case IDC_F4WX_CUSTOM_TIMEZONE:
-					if (HIWORD(wparam) == EN_KILLFOCUS) {
-						wchar_t buf[MAX_EDIT_LENGTH + 1];
-						GetWindowTextW(reinterpret_cast<HWND>(lparam), buf, static_cast<int>(std::size(buf)));
-						set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE, between(parse_wide_float(buf).value_or(0.0f), -12.0f, +14.0f), L"{:+2.2f}");
-					}
-					break;
 
 				case IDC_F4WX_CUSTOM_TLAT:
 				case IDC_F4WX_CUSTOM_BLAT:
@@ -2218,9 +2206,6 @@ void f4wx_custom::on_close(bool ok)
 		td.llon = parse_wide_float(buf).value_or(0.0f);
 		GetWindowTextW(GetDlgItem(m_hwnd, IDC_F4WX_CUSTOM_RLON), buf, static_cast<int>(std::size(buf)));
 		td.rlon = parse_wide_float(buf).value_or(0.0f);
-
-		GetWindowTextW(GetDlgItem(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE), buf, static_cast<int>(std::size(buf)));
-		td.timezone = static_cast<int>(parse_wide_float(buf).value_or(0.0f) * 60);  // stored in minutes
 
 		td.size = static_cast<WORD>(64 * (1 + SendDlgItemMessage(m_hwnd, IDC_F4WX_CUSTOM_THEATER_SIZE, CB_GETCURSEL, static_cast<WPARAM>(0), static_cast<LPARAM>(0))));
 

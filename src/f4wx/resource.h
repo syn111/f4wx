@@ -96,7 +96,7 @@
 #define IDC_F4WX_MAIN_CAMPAIGN_HOUR             1021
 #define IDC_F4WX_MAIN_CAMPAIGN_MINUTE           1022
 #define IDC_F4WX_MAIN_SAVE_SEQUENCE             1023
-#define IDC_F4WX_MAIN_SYNC_TIMEZONE             1024
+#define IDC_F4WX_MAIN_SYNC_REAL_TIME            1024
 #define IDC_F4WX_MAIN_WARN_SYNC                 1025
 #define IDC_F4WX_MAIN_WARN_INTERVAL             1026
 #define IDC_F4WX_MAIN_WARN_FORECAST             1027
@@ -109,7 +109,6 @@
 #define IDC_F4WX_MAIN_ABOUT                     1034
 #define IDC_F4WX_MAIN_NODATA                    1035
 #define IDC_F4WX_MAIN_MINUTE                    1036
-#define IDC_F4WX_MAIN_WARN_TIMEZONE             1037
 #define IDC_F4WX_MAIN_WARN_START                1038
 #define IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD      1039
 
@@ -143,7 +142,6 @@
 #define IDC_F4WX_CUSTOM_RLON                    1401
 #define IDC_F4WX_CUSTOM_TLAT                    1402
 #define IDC_F4WX_CUSTOM_BLAT                    1403
-#define IDC_F4WX_CUSTOM_TIMEZONE                1404
 #define IDC_F4WX_CUSTOM_THEATER_SIZE            1405
 #define IDC_F4WX_DEBUG_TEXT                     1406
 

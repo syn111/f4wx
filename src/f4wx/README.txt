@@ -70,7 +70,7 @@ Q: Do I have to put the first file of the sequence in a different folder?
 A: Reportedly if your campaign starts at 05:00 BMS will not load the first (10500.fmap) file automatically from the WeatherMapsUpdates directory. You may either move that file manually, or better yet select 05:01 (real campaign start +1 minute) as start time in F4Wx and forget about this issue
 
 
-Q: How does "Sync With Real Time (Zulu)" work?
+Q: How does "Sync With Real Time" work?
 
 A: Since BMS 4.35, fmap auto-update uses Zulu (UTC), not theater local time. Set Initial Time to your campaign start in Zulu. With Sync enabled, F4Wx skips forecast steps so GRIB UTC matches that Zulu clock (so day/night weather stays correct).
 

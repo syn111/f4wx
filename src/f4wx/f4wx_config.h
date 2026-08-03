@@ -19,7 +19,7 @@
 #pragma once
 
 /**
- * Built-in theater definitions (name, grid size, timezone, lat/lon bounds, resource ID for map image).
+ * Built-in theater definitions (name, grid size, lat/lon bounds, resource ID for map image).
  */
 
 #include <Windows.h>
@@ -29,7 +29,6 @@
 /** Single theater record; matches layout expected by UI and converter. */
 struct f4wx_theater_data {
 	std::string name;
-	int timezone = +540;
 	WORD size = 64;
 	float tlat = 43;
 	float blat = 34;
@@ -42,7 +41,6 @@ struct f4wx_theater_data {
 struct theater_def {
 	const char* name;
 	unsigned size;
-	int timezone;
 	float tlat;
 	float blat;
 	float llon;

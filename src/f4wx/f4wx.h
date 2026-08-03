@@ -328,7 +328,7 @@ private:
 	void ui_set_fmap_interval(int val);
 	void ui_set_fmap_maxforecast(int val);
 
-	void ui_set_sync_timezone(bool val);
+	void ui_set_sync_real_time(bool val);
 	void ui_set_start_current(bool val);
 	void ui_set_for_volumetric_cloud(bool val);
 
@@ -390,7 +390,7 @@ private:
 	void set_current_fmap(size_t pos, bool override = false);
 
 	size_t get_sync_min_pos();
-	void correct_for_timezone_sync(size_t &pos);
+	void correct_for_real_time_sync(size_t &pos);
 
 	void threaded_save_sequence(std::filesystem::path path);
 	[[nodiscard]] int save_sequence(const std::filesystem::path& path);
