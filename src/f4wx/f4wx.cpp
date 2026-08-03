@@ -26,6 +26,7 @@
 #include <future>
 #include <mutex>
 #include <deque>
+#include <set>
 #include <atomic>
 #include <cerrno>
 #include <cstdio>
@@ -502,10 +503,10 @@ void f4wx::ui_set_bms_minute(int val)
 	set_current_fmap(m_current_map_idx, true);
 }
 
-void f4wx::ui_set_sync_timezone(bool val)
+void f4wx::ui_set_sync_real_time(bool val)
 {
 	m_ui_sync_with_real = val;
-	CheckDlgButton(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE, val);
+	CheckDlgButton(m_hwnd, IDC_F4WX_MAIN_SYNC_REAL_TIME, val);
 	set_current_fmap(m_current_map_idx, true);
 	if (val == false)
 		show_warning(IDC_F4WX_MAIN_WARN_SYNC, false);
@@ -610,12 +611,15 @@ void f4wx::initialize_controls()
 	ui_set_bms_day(1);
 	SendDlgItemMessage(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_DAY, EM_SETLIMITTEXT, 3, 0);
 
-	ui_set_bms_hour(9);
+	ui_set_bms_hour(0);
 	SendDlgItemMessage(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_HOUR, EM_SETLIMITTEXT, 2, 0);
 
 	ui_set_bms_minute(0);
 	m_ui_initial_time_minute = 0;
 	SendDlgItemMessage(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_MINUTE, EM_SETLIMITTEXT, 2, 0);
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_DAY), L"Campaign Initial Time day for FMAP filenames (BMS Zulu).");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_HOUR), L"Campaign Initial Time hour (BMS Zulu). Default 00Z.");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_MINUTE), L"Campaign Initial Time minute (BMS Zulu).");
 
 	// Disable custom save options
 	set_save_mode(ui_save_mode::single);
@@ -623,8 +627,8 @@ void f4wx::initialize_controls()
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SAVE_SINGLE), L"Save only the currently previewed weather.");
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SAVE_SEQUENCE), L"Save a sequence of files according to the parameters below.");
 
-	ui_set_sync_timezone(false);
-	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE), L"Adjust FMAP generation so that local-time in BMS matches real-time of the forecast.");
+	ui_set_sync_real_time(false);
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_REAL_TIME), L"Skip forecast steps so GRIB UTC clock matches BMS Zulu clock (Initial Time).");
 
 	ui_set_for_volumetric_cloud(true);
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD), L"Use linear cloud density mapping (1-13) for volumetric cloud rendering.");
@@ -642,7 +646,7 @@ void f4wx::initialize_controls()
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_WARN_FORECAST), L"Warning! The GRIB data loaded is insufficient to generate that much forecast. Not all FMAP files will be generated.");
 
 	show_warning(IDC_F4WX_MAIN_WARN_SYNC, false);
-	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_WARN_SYNC), L"Warning! With the currently selected options real-time time cannot be matched.");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_WARN_SYNC), L"Warning! GRIB UTC clock cannot be matched to BMS Zulu clock with the current options.");
 
 	// Register the save grib files hotkey
 	RegisterHotKey(m_hwnd, static_cast<int>(f4wx_hotkeys::HK_SAVE_GRIB_FILES), MOD_CONTROL | MOD_SHIFT, 0x53);
@@ -681,7 +685,7 @@ void f4wx::set_save_mode(ui_save_mode mode)
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_MINUTE);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
-	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE);
+	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_REAL_TIME);
 	EnableWindow(hdlg, mode == ui_save_mode::sequence);
 
 	hdlg = GetDlgItem(m_hwnd, IDC_F4WX_MAIN_START_CURRENT);
@@ -752,8 +756,8 @@ INT_PTR f4wx::on_command(WPARAM wparam, LPARAM lparam)
 			}
 			break;
 
-		case IDC_F4WX_MAIN_SYNC_TIMEZONE:
-			ui_set_sync_timezone(!m_ui_sync_with_real);
+		case IDC_F4WX_MAIN_SYNC_REAL_TIME:
+			ui_set_sync_real_time(!m_ui_sync_with_real);
 			break;
 
 		case IDC_F4WX_MAIN_START_CURRENT:
@@ -1176,7 +1180,7 @@ INT_PTR f4wx::on_hotkey(WPARAM wparam, LPARAM lparam)
 void f4wx::set_current_fmap(size_t pos, bool override)
 {
 	if ((override || pos != m_current_map_idx) && pos < get_fmap_count()) {
-		correct_for_timezone_sync(pos);
+		correct_for_real_time_sync(pos);
 		m_current_map_idx = pos;
 
 		if (!m_current_map || (m_current_map->get_sizeY() != fmap_cells_from_size(m_current_theater.size) || m_current_map->get_sizeX() != fmap_cells_from_size(m_current_theater.size))) {
@@ -1680,15 +1684,51 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 		return;
 	}
 
+	// GFS run reference time; each forecast file is this + forecast hour.
+	const auto& gfsrun = m_gfsruns[idx];
+	std::tm run_tm = {};
+	run_tm.tm_year = std::stoi(gfsrun.get_year()) - 1900;
+	run_tm.tm_mon = std::stoi(gfsrun.get_month()) - 1;
+	run_tm.tm_mday = std::stoi(gfsrun.get_day());
+	run_tm.tm_hour = std::stoi(gfsrun.get_hour());
+	run_tm.tm_isdst = -1;
+	const std::time_t run_tt = _mkgmtime(&run_tm);
+
 	std::mutex mtx;
 	std::atomic<bool> stop_download = false;
 	int global_rv = 0;
 	size_t processed_count = 0;
+	// In-flight forecast hours; status shows the earliest so parallel workers don't flicker.
+	std::set<int> inflight_hours;
+	int status_hour = -1;
+
+	auto update_download_status = [&]() {
+		if (inflight_hours.empty())
+			return;
+		const int hour = *inflight_hours.begin();
+		if (hour == status_hour)
+			return;
+		status_hour = hour;
+		std::string msg;
+		if (run_tt != static_cast<std::time_t>(-1)) {
+			std::optional<std::tm> opt = gmtime_utc(run_tt + hour * 3600);
+			if (opt) {
+				// Same DD/MM/YY HH:MM UTC format as main-window GRIB Current Time.
+				msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d} UTC (f+{})...",
+					opt->tm_mday, opt->tm_mon + 1, (opt->tm_year + 1900) % 100,
+					opt->tm_hour, opt->tm_min, hour);
+			}
+		}
+		if (msg.empty())
+			msg = std::format("Downloading Hour {:03d}...", hour);
+		m_bar->set_text(msg.c_str());
+	};
 
 	auto worker = [&, stoken]() {
 		noaa_downloader dl;
 		while (true) {
 			noaa_gfsrun_forecastfilename fn;
+			int thishour = 0;
 			{
 				std::lock_guard<std::mutex> lock(mtx);
 				if (queue.empty() || stop_download) return;
@@ -1707,8 +1747,9 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 					return;
 				}
 
-				std::string msg = "Downloading Hour " + fn.get_hour() + "...";
-				m_bar->set_text(msg.c_str());
+				thishour = std::stoi(fn.get_hour());
+				inflight_hours.insert(thishour);
+				update_download_status();
 			}
 
 			auto f = std::make_unique<grib_file>(fn);
@@ -1721,6 +1762,8 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 
 			{
 				std::lock_guard<std::mutex> lock(mtx);
+				inflight_hours.erase(thishour);
+
 				if (stop_download) { // Check if stopped while we were downloading
 					return;
 				}
@@ -1738,6 +1781,7 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 				m_gribfiles.push_back(std::move(f));
 				processed_count++;
 				m_bar->set_position(processed_count);
+				update_download_status();
 			}
 		}
 	};
@@ -1968,7 +2012,7 @@ INT_PTR f4wx::on_paint(HWND hwnd)
 	return 0;
 }
 
-void f4wx::correct_for_timezone_sync(size_t &pos)
+void f4wx::correct_for_real_time_sync(size_t &pos)
 {
 	size_t minpos = get_sync_min_pos();
 	if (pos < minpos)
@@ -1986,15 +2030,22 @@ size_t f4wx::get_sync_min_pos()
 {
 	size_t pos = 0;
 
+	// BMS 4.35+: fmap load times and campaign Initial Time are Zulu (UTC). Align GRIB
+	// validity UTC clock to Initial Time Zulu clock.
 	if (m_ui_sync_with_real == true) {
 		if (get_fmap_count() > 0) {
-			int gfsminutes = m_converter.get_grib_hour() * 60 + m_current_theater.timezone;
-			int bmsminutes = m_ui_initial_time_hour * 60 + m_ui_initial_time_minute;
-			int minpos = (bmsminutes - gfsminutes) / static_cast<int>(m_converter_options.interval_minutes);
-			if (minpos < 0)
-				minpos += (24 * 60) / m_converter_options.interval_minutes;
-			if (minpos > 0 && static_cast<size_t>(minpos) > pos)
-				pos = std::min(static_cast<size_t>(minpos), get_fmap_count() - 1);
+			int interval = static_cast<int>(m_converter_options.interval_minutes);
+			if (interval > 0) {
+				int gfsminutes = m_converter.get_grib_hour() * 60;
+				int bmsminutes = static_cast<int>(m_ui_initial_time_hour * 60 + m_ui_initial_time_minute);
+				// Truncate toward zero, then wrap negatives. Positive modulo would skip ~a full
+				// day when Initial Time minutes cannot exact-match GRIB (e.g. 05:01 vs 06Z).
+				int minpos = (bmsminutes - gfsminutes) / interval;
+				if (minpos < 0)
+					minpos += 1440 / interval;
+				if (minpos > 0)
+					pos = std::min(static_cast<size_t>(minpos), get_fmap_count() - 1);
+			}
 		}
 	}
 	return pos;
@@ -2038,26 +2089,13 @@ void f4wx::ui_update_status_times()
 		int bmsday, bmshr, bmsmin;
 		get_bms_time(static_cast<int>((m_current_map_idx - get_sync_min_pos()) * m_converter_options.interval_minutes), bmsday, bmshr, bmsmin);
 
-		int tzhr = m_current_theater.timezone / 60, tzmin = m_current_theater.timezone % 60;
-
-		auto bms_time_str = tzmin > 0 
-			? std::format(L"Day {} {:02d}:{:02d} (UTC{}{}:{})", bmsday, bmshr, bmsmin, tzhr >= 0 ? L'+' : L'-', abs(tzhr), abs(tzmin))
-			: std::format(L"Day {} {:02d}:{:02d} (UTC{}{})", bmsday, bmshr, bmsmin, tzhr >= 0 ? L'+' : L'-', abs(tzhr));
-		
+		// BMS fmap / Initial Time are Zulu since 4.35+.
+		auto bms_time_str = std::format(L"Day {} {:02d}:{:02d}Z", bmsday, bmshr, bmsmin);
 		SendDlgItemMessageW(m_hwnd, IDC_F4WX_MAIN_BMS_TIME, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(bms_time_str.c_str()));
 
-		// Build 39: Show timezone warning
-		if (m_ui_sync_with_real == true) {
-			bmshr = (bmshr - tzhr) % 24;
-			bmsmin -= tzmin;
-			if (bmsmin < 0) {
-				bmshr--;
-				bmsmin += 60;
-			}
-			if (bmshr < 0)
-				bmshr += 24;
+		// Sync on: warn when GRIB UTC clock does not match BMS Zulu clock.
+		if (m_ui_sync_with_real == true)
 			showwarning = (hr != bmshr || min != bmsmin);
-		}
 	}
 	ShowWindow(GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CURRENT_TIME), map != nullptr ? SW_SHOW : SW_HIDE);
 	ShowWindow(GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CURRENT_TIME_PREFIX), map != nullptr ? SW_SHOW : SW_HIDE);
@@ -2125,9 +2163,6 @@ f4wx_custom::f4wx_custom(HWND hparent, f4wx_theater_data &data)
 {
 	init_dialog(IDD_F4WX_CUSTOM, hparent);
 
-	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE, data.timezone/60.0f, L"{:+2.2f}");
-	SendDlgItemMessage(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE, EM_SETLIMITTEXT, 7, 0);
-
 	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_BLAT, data.blat, L"{:+02.2f}");
 	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_TLAT, data.tlat, L"{:+02.2f}");
 	set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_RLON, data.rlon, L"{:+03.2f}");
@@ -2155,7 +2190,6 @@ INT_PTR CALLBACK f4wx_custom::dialog_proc(HWND hwnd, UINT msg, WPARAM wparam, LP
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_BLAT), L"Enter theater bottommost latitude. (+N/-S)");
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_LLON), L"Enter theater leftmost longitude. (+E/-W)");
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_RLON), L"Enter theater rightmost longitude. (+E/-W)");
-			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_TIMEZONE), L"Enter theater timezone.");
 			create_tooltip(hwnd, GetDlgItem(hwnd, IDC_F4WX_CUSTOM_THEATER_SIZE), L"Enter theater segment size. (default: 64)");
 
 			break;
@@ -2175,14 +2209,6 @@ INT_PTR CALLBACK f4wx_custom::dialog_proc(HWND hwnd, UINT msg, WPARAM wparam, LP
 				case IDCANCEL:
 					on_close(false);
 					return TRUE;
-
-				case IDC_F4WX_CUSTOM_TIMEZONE:
-					if (HIWORD(wparam) == EN_KILLFOCUS) {
-						wchar_t buf[MAX_EDIT_LENGTH + 1];
-						GetWindowTextW(reinterpret_cast<HWND>(lparam), buf, static_cast<int>(std::size(buf)));
-						set_text_control_float(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE, between(parse_wide_float(buf).value_or(0.0f), -12.0f, +14.0f), L"{:+2.2f}");
-					}
-					break;
 
 				case IDC_F4WX_CUSTOM_TLAT:
 				case IDC_F4WX_CUSTOM_BLAT:
@@ -2226,9 +2252,6 @@ void f4wx_custom::on_close(bool ok)
 		td.llon = parse_wide_float(buf).value_or(0.0f);
 		GetWindowTextW(GetDlgItem(m_hwnd, IDC_F4WX_CUSTOM_RLON), buf, static_cast<int>(std::size(buf)));
 		td.rlon = parse_wide_float(buf).value_or(0.0f);
-
-		GetWindowTextW(GetDlgItem(m_hwnd, IDC_F4WX_CUSTOM_TIMEZONE), buf, static_cast<int>(std::size(buf)));
-		td.timezone = static_cast<int>(parse_wide_float(buf).value_or(0.0f) * 60);  // stored in minutes
 
 		td.size = static_cast<WORD>(64 * (1 + SendDlgItemMessage(m_hwnd, IDC_F4WX_CUSTOM_THEATER_SIZE, CB_GETCURSEL, static_cast<WPARAM>(0), static_cast<LPARAM>(0))));
 
