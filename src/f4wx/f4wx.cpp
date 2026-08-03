@@ -1714,9 +1714,9 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 			std::optional<std::tm> opt = gmtime_utc(run_tt + hour * 3600);
 			if (opt) {
 				// Same DD/MM/YY HH:MM UTC format as main-window GRIB Current Time.
-				msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d} UTC...",
+				msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d} UTC (f+{})...",
 					opt->tm_mday, opt->tm_mon + 1, (opt->tm_year + 1900) % 100,
-					opt->tm_hour, opt->tm_min);
+					opt->tm_hour, opt->tm_min, hour);
 			}
 		}
 		if (msg.empty())
