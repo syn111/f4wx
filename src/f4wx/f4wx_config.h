@@ -26,8 +26,7 @@
 #include <cstddef>
 #include <string>
 
-/** Single theater record; matches layout expected by UI and converter.
- *  timezone is minutes east of UTC (fixed BMS theater offset; no DST). Used for LT display only since BMS 4.35+ fmap times are Zulu. */
+/** Single theater record; matches layout expected by UI and converter. */
 struct f4wx_theater_data {
 	std::string name;
 	int timezone = +540;

@@ -1990,7 +1990,7 @@ size_t f4wx::get_sync_min_pos()
 	size_t pos = 0;
 
 	// BMS 4.35+: fmap load times and campaign Initial Time are Zulu (UTC). Align GRIB
-	// validity UTC to Initial Time; theater timezone is only for LT display.
+	// validity UTC to Initial Time.
 	if (m_ui_sync_with_real == true) {
 		if (get_fmap_count() > 0) {
 			int gfsminutes = m_converter.get_grib_hour() * 60;
@@ -2043,10 +2043,8 @@ void f4wx::ui_update_status_times()
 		int bmsday, bmshr, bmsmin;
 		get_bms_time(static_cast<int>((m_current_map_idx - get_sync_min_pos()) * m_converter_options.interval_minutes), bmsday, bmshr, bmsmin);
 
-		// BMS Time is Zulu; theater offset is a fixed LT label (BMS has no DST).
-		int ltmins = ((bmshr * 60 + bmsmin + m_current_theater.timezone) % 1440 + 1440) % 1440;
-		int lthr = ltmins / 60, ltmin = ltmins % 60;
-		auto bms_time_str = std::format(L"Day {} {:02d}:{:02d}Z ({:02d}:{:02d} LT)", bmsday, bmshr, bmsmin, lthr, ltmin);
+		// BMS fmap / Initial Time are Zulu since 4.35+.
+		auto bms_time_str = std::format(L"Day {} {:02d}:{:02d}Z", bmsday, bmshr, bmsmin);
 		SendDlgItemMessageW(m_hwnd, IDC_F4WX_MAIN_BMS_TIME, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(bms_time_str.c_str()));
 
 		// Sync on: warn when GRIB UTC clock does not match BMS Zulu Initial Time.
