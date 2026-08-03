@@ -118,7 +118,7 @@ BEGIN
     GROUPBOX        "5. Save Weather",IDC_STATIC,22,253,156,185
     CONTROL         "Save Current",IDC_F4WX_MAIN_SAVE_SINGLE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,30,267,66,10
     CONTROL         "Save Sequence",IDC_F4WX_MAIN_SAVE_SEQUENCE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,30,282,66,10
-    LTEXT           "Initial Time",IDC_STATIC,42,294,40,8
+    LTEXT           "Initial Time (Zulu)",IDC_STATIC,28,294,68,8
     LTEXT           "Day",IDC_STATIC,99,294,14,8
     LTEXT           "Hour",IDC_STATIC,121,294,15,8
     LTEXT           "Minute",IDC_STATIC,145,294,21,8

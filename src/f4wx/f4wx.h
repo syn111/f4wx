@@ -227,10 +227,10 @@ private:
 	ui_save_mode m_ui_save = ui_save_mode::none;
 
 	unsigned long m_ui_initial_time_day = 1;
-	unsigned long m_ui_initial_time_hour = 9;
+	unsigned long m_ui_initial_time_hour = 0;
 	unsigned long m_ui_initial_time_minute = 0;
 
-	bool m_ui_sync_with_real = true;
+	bool m_ui_sync_with_real = false;
 	bool m_ui_start_from_current = false;
 	bool m_ui_save_previews = false;
 	bool m_ui_for_volumetric_cloud = true;

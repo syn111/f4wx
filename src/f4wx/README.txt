@@ -72,7 +72,7 @@ A: Reportedly if your campaign starts at 05:00 BMS will not load the first (1050
 
 Q: How does "Sync With Real Time" work?
 
-A: Since BMS 4.35, fmap auto-update uses Zulu (UTC), not theater local time. Set Initial Time to your campaign start in Zulu. With Sync enabled, F4Wx skips forecast steps so GRIB UTC matches that Zulu clock (so day/night weather stays correct).
+A: Since BMS 4.35, fmap auto-update uses Zulu (UTC), not theater local time. Set Initial Time to your campaign start in Zulu. With Sync enabled, F4Wx skips forecast steps so GRIB UTC matches that Zulu clock (so day/night weather stays correct). This targets BMS 4.35+; the older local-time fmap sync behavior is gone.
 
 
 Q: Is this compatible with Windows XX?
