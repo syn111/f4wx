@@ -130,7 +130,8 @@ int grib_field::param_id() const
 	int cat = static_cast<int>(m_gfld->ipdtmpl[0]);
 	int num = static_cast<int>(m_gfld->ipdtmpl[1]);
 	int base = param_id_from_grib2(disc, cat, num);
-	/* 2m/surface temperature: height 2 m (103/2) or ground (1/0) for legacy compatibility. */
+	/* Temperature: 2 m AGL (preferred) or ground/skin (1/0) for legacy files without 2 m.
+	 * Preference when both are present is applied in grib_converter::add_grib. */
 	if (base == GRIB2_PARAM_2M_TEMP) {
 		int sfc = type_of_first_fixed_surface();
 		long lev = level();
