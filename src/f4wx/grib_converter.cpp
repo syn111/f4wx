@@ -308,31 +308,8 @@ int grib_converter::add_grib(std::span<std::byte> data)
 				try {
 				switch (param) {
 					case GRIB2_PARAM_2M_TEMP:
-					{
-						/* Prefer 2 m air temperature over ground/skin TMP when both exist (e.g. GFS).
-						 * Keep ground TMP only as a legacy fallback when 2 m is absent for that step. */
-						auto& temp_list = m_breakpoints[static_cast<size_t>(grib_breakpoint_type::GBP_TEMPERATURE)];
-						const int sfc = m.type_of_first_fixed_surface();
-						const long lev = m.level();
-						const long step = m.start_step();
-						const bool is_2m = (sfc == GRIB2_SFC_HEIGHT_ABOVE_GROUND && lev == GRIB2_LEVEL_2M);
-						const bool is_ground = (sfc == GRIB2_SFC_GROUND && lev == 0);
-
-						if (is_2m) {
-							std::erase_if(temp_list, [step](const std::unique_ptr<grib_breakpoint>& bp) {
-								return bp && bp->startStep == step;
-							});
-							add_breakpoint(temp_list, m, file_max_step);
-						}
-						else if (is_ground) {
-							const bool have_step = std::ranges::any_of(temp_list, [step](const std::unique_ptr<grib_breakpoint>& bp) {
-								return bp && bp->startStep == step;
-							});
-							if (!have_step)
-								add_breakpoint(temp_list, m, file_max_step);
-						}
+						add_breakpoint(m_breakpoints[static_cast<size_t>(grib_breakpoint_type::GBP_TEMPERATURE)], m, file_max_step);
 						break;
-					}
 					case GRIB2_PARAM_10M_UWIND:
 						add_breakpoint(m_breakpoints[static_cast<size_t>(grib_breakpoint_type::GBP_10U)], m, file_max_step);
 						break;
