@@ -616,6 +616,9 @@ void f4wx::initialize_controls()
 	ui_set_bms_minute(0);
 	m_ui_initial_time_minute = 0;
 	SendDlgItemMessage(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_MINUTE, EM_SETLIMITTEXT, 2, 0);
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_DAY), L"Campaign Initial Time day for FMAP filenames.");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_HOUR), L"Campaign Initial Time hour (BMS Zulu).");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CAMPAIGN_MINUTE), L"Campaign Initial Time minute (BMS Zulu).");
 
 	// Disable custom save options
 	set_save_mode(ui_save_mode::single);
@@ -624,7 +627,7 @@ void f4wx::initialize_controls()
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SAVE_SEQUENCE), L"Save a sequence of files according to the parameters below.");
 
 	ui_set_sync_timezone(false);
-	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE), L"Adjust FMAP generation so that local-time in BMS matches real-time of the forecast.");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_SYNC_TIMEZONE), L"Skip forecast steps so GRIB UTC matches BMS Zulu Initial Time.");
 
 	ui_set_for_volumetric_cloud(true);
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_FOR_VOLUMETRIC_CLOUD), L"Use linear cloud density mapping (1-13) for volumetric cloud rendering.");
@@ -642,7 +645,7 @@ void f4wx::initialize_controls()
 	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_WARN_FORECAST), L"Warning! The GRIB data loaded is insufficient to generate that much forecast. Not all FMAP files will be generated.");
 
 	show_warning(IDC_F4WX_MAIN_WARN_SYNC, false);
-	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_WARN_SYNC), L"Warning! With the currently selected options real-time time cannot be matched.");
+	create_tooltip(m_hwnd, GetDlgItem(m_hwnd, IDC_F4WX_MAIN_WARN_SYNC), L"Warning! With the currently selected options GRIB UTC cannot be matched to BMS Zulu Time.");
 
 	// Register the save grib files hotkey
 	RegisterHotKey(m_hwnd, static_cast<int>(f4wx_hotkeys::HK_SAVE_GRIB_FILES), MOD_CONTROL | MOD_SHIFT, 0x53);
@@ -1986,9 +1989,11 @@ size_t f4wx::get_sync_min_pos()
 {
 	size_t pos = 0;
 
+	// BMS 4.35+: fmap load times and campaign Initial Time are Zulu (UTC). Align GRIB
+	// validity UTC to Initial Time; theater timezone is only for LT display.
 	if (m_ui_sync_with_real == true) {
 		if (get_fmap_count() > 0) {
-			int gfsminutes = m_converter.get_grib_hour() * 60 + m_current_theater.timezone;
+			int gfsminutes = m_converter.get_grib_hour() * 60;
 			int bmsminutes = m_ui_initial_time_hour * 60 + m_ui_initial_time_minute;
 			int minpos = (bmsminutes - gfsminutes) / static_cast<int>(m_converter_options.interval_minutes);
 			if (minpos < 0)
@@ -2038,26 +2043,15 @@ void f4wx::ui_update_status_times()
 		int bmsday, bmshr, bmsmin;
 		get_bms_time(static_cast<int>((m_current_map_idx - get_sync_min_pos()) * m_converter_options.interval_minutes), bmsday, bmshr, bmsmin);
 
-		int tzhr = m_current_theater.timezone / 60, tzmin = m_current_theater.timezone % 60;
-
-		auto bms_time_str = tzmin > 0 
-			? std::format(L"Day {} {:02d}:{:02d} (UTC{}{}:{})", bmsday, bmshr, bmsmin, tzhr >= 0 ? L'+' : L'-', abs(tzhr), abs(tzmin))
-			: std::format(L"Day {} {:02d}:{:02d} (UTC{}{})", bmsday, bmshr, bmsmin, tzhr >= 0 ? L'+' : L'-', abs(tzhr));
-		
+		// BMS Time is Zulu; theater offset is a fixed LT label (BMS has no DST).
+		int ltmins = ((bmshr * 60 + bmsmin + m_current_theater.timezone) % 1440 + 1440) % 1440;
+		int lthr = ltmins / 60, ltmin = ltmins % 60;
+		auto bms_time_str = std::format(L"Day {} {:02d}:{:02d}Z ({:02d}:{:02d} LT)", bmsday, bmshr, bmsmin, lthr, ltmin);
 		SendDlgItemMessageW(m_hwnd, IDC_F4WX_MAIN_BMS_TIME, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(bms_time_str.c_str()));
 
-		// Build 39: Show timezone warning
-		if (m_ui_sync_with_real == true) {
-			bmshr = (bmshr - tzhr) % 24;
-			bmsmin -= tzmin;
-			if (bmsmin < 0) {
-				bmshr--;
-				bmsmin += 60;
-			}
-			if (bmshr < 0)
-				bmshr += 24;
+		// Sync on: warn when GRIB UTC clock does not match BMS Zulu Initial Time.
+		if (m_ui_sync_with_real == true)
 			showwarning = (hr != bmshr || min != bmsmin);
-		}
 	}
 	ShowWindow(GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CURRENT_TIME), map != nullptr ? SW_SHOW : SW_HIDE);
 	ShowWindow(GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CURRENT_TIME_PREFIX), map != nullptr ? SW_SHOW : SW_HIDE);
