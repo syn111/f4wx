@@ -2038,9 +2038,11 @@ size_t f4wx::get_sync_min_pos()
 			if (interval > 0) {
 				int gfsminutes = m_converter.get_grib_hour() * 60;
 				int bmsminutes = static_cast<int>(m_ui_initial_time_hour * 60 + m_ui_initial_time_minute);
-				// Positive minutes-of-day delta, then divide (avoids toward-zero truncation on negatives).
-				int delta_mod = ((bmsminutes - gfsminutes) % 1440 + 1440) % 1440;
-				int minpos = delta_mod / interval;
+				// Truncate toward zero, then wrap negatives. Positive modulo would skip ~a full
+				// day when Initial Time minutes cannot exact-match GRIB (e.g. 05:01 vs 06Z).
+				int minpos = (bmsminutes - gfsminutes) / interval;
+				if (minpos < 0)
+					minpos += 1440 / interval;
 				if (minpos > 0)
 					pos = std::min(static_cast<size_t>(minpos), get_fmap_count() - 1);
 			}
