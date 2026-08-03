@@ -26,6 +26,7 @@
 #include <future>
 #include <mutex>
 #include <deque>
+#include <set>
 #include <atomic>
 #include <cerrno>
 #include <cstdio>
@@ -1697,11 +1698,37 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 	std::atomic<bool> stop_download = false;
 	int global_rv = 0;
 	size_t processed_count = 0;
+	// In-flight forecast hours; status shows the earliest so parallel workers don't flicker.
+	std::set<int> inflight_hours;
+	int status_hour = -1;
+
+	auto update_download_status = [&]() {
+		if (inflight_hours.empty())
+			return;
+		const int hour = *inflight_hours.begin();
+		if (hour == status_hour)
+			return;
+		status_hour = hour;
+		std::string msg;
+		if (run_tt != static_cast<std::time_t>(-1)) {
+			std::optional<std::tm> opt = gmtime_utc(run_tt + hour * 3600);
+			if (opt) {
+				// Same DD/MM/YY HH:MM UTC format as main-window GRIB Current Time.
+				msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d} UTC...",
+					opt->tm_mday, opt->tm_mon + 1, (opt->tm_year + 1900) % 100,
+					opt->tm_hour, opt->tm_min);
+			}
+		}
+		if (msg.empty())
+			msg = std::format("Downloading Hour {:03d}...", hour);
+		m_bar->set_text(msg.c_str());
+	};
 
 	auto worker = [&, stoken]() {
 		noaa_downloader dl;
 		while (true) {
 			noaa_gfsrun_forecastfilename fn;
+			int thishour = 0;
 			{
 				std::lock_guard<std::mutex> lock(mtx);
 				if (queue.empty() || stop_download) return;
@@ -1720,19 +1747,9 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 					return;
 				}
 
-				// Same DD/MM/YY HH:MM UTC format as main-window GRIB Current Time.
-				std::string msg;
-				if (run_tt != static_cast<std::time_t>(-1)) {
-					std::optional<std::tm> opt = gmtime_utc(run_tt + std::stoi(fn.get_hour()) * 3600);
-					if (opt) {
-						msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d} UTC...",
-							opt->tm_mday, opt->tm_mon + 1, (opt->tm_year + 1900) % 100,
-							opt->tm_hour, opt->tm_min);
-					}
-				}
-				if (msg.empty())
-					msg = "Downloading Hour " + fn.get_hour() + "...";
-				m_bar->set_text(msg.c_str());
+				thishour = std::stoi(fn.get_hour());
+				inflight_hours.insert(thishour);
+				update_download_status();
 			}
 
 			auto f = std::make_unique<grib_file>(fn);
@@ -1745,6 +1762,8 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 
 			{
 				std::lock_guard<std::mutex> lock(mtx);
+				inflight_hours.erase(thishour);
+
 				if (stop_download) { // Check if stopped while we were downloading
 					return;
 				}
@@ -1762,6 +1781,7 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 				m_gribfiles.push_back(std::move(f));
 				processed_count++;
 				m_bar->set_position(processed_count);
+				update_download_status();
 			}
 		}
 	};
