@@ -4,6 +4,7 @@ v2.1.1 (unreleased)
  * Fixed "Sync With Real Time" for BMS 4.35+ Zulu fmap loading (no longer applies theater timezone to sync; Initial Time / FMAP names are Zulu)
  * BMS Time status shows Zulu time
  * Removed unused theater timezone from presets and Custom download dialog; renamed sync option to "Sync With Real Time"
+ * NOAA download progress shows forecast UTC timestamp instead of forecast hour number
 
 v2.1.0 (06-JUL-2026)
 --------------------

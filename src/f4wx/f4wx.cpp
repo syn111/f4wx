@@ -1683,6 +1683,16 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 		return;
 	}
 
+	// GFS run reference time; each forecast file is this + forecast hour.
+	const auto& gfsrun = m_gfsruns[idx];
+	std::tm run_tm = {};
+	run_tm.tm_year = std::stoi(gfsrun.get_year()) - 1900;
+	run_tm.tm_mon = std::stoi(gfsrun.get_month()) - 1;
+	run_tm.tm_mday = std::stoi(gfsrun.get_day());
+	run_tm.tm_hour = std::stoi(gfsrun.get_hour());
+	run_tm.tm_isdst = -1;
+	const std::time_t run_tt = _mkgmtime(&run_tm);
+
 	std::mutex mtx;
 	std::atomic<bool> stop_download = false;
 	int global_rv = 0;
@@ -1710,7 +1720,18 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 					return;
 				}
 
-				std::string msg = "Downloading Hour " + fn.get_hour() + "...";
+				// Same DD/MM/YY HH:MM UTC format as main-window GRIB Current Time.
+				std::string msg;
+				if (run_tt != static_cast<std::time_t>(-1)) {
+					std::optional<std::tm> opt = gmtime_utc(run_tt + std::stoi(fn.get_hour()) * 3600);
+					if (opt) {
+						msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d} UTC...",
+							opt->tm_mday, opt->tm_mon + 1, (opt->tm_year + 1900) % 100,
+							opt->tm_hour, opt->tm_min);
+					}
+				}
+				if (msg.empty())
+					msg = "Downloading Hour " + fn.get_hour() + "...";
 				m_bar->set_text(msg.c_str());
 			}
 
