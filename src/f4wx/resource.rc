@@ -187,9 +187,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE
 CAPTION "About"
 FONT 8, "Ms Shell Dlg", 0, 0, 0x0
 BEGIN
-    ICON            IDI_ICON1,IDC_STATIC,12,27,96,96,SS_REALSIZECONTROL
-    LTEXT           "F4Wx v1.0",IDC_F4WX_ABOUT_TEXT,133,16,118,9
-    LTEXT           "Weather generator for BMS 4.36+.\r\n\r\nCreated by 'Ahmed'. <ahmedakbar@gmx.com>\r\n\r\nWeather data provided by NOAA.\r\n\r\nThis program uses the NOAA-EMC NCEPLIBS-g2c library.\r\n\r\nIcon by Custom Icon Design.\r\n\r\n(c) Ahmed 2016-2026.",IDC_STATIC,133,32,112,105
+    ICON            IDI_ICON1,IDC_STATIC,16,27,96,96,SS_REALSIZECONTROL
+    LTEXT           "F4Wx v1.0",IDC_F4WX_ABOUT_TEXT,128,16,120,9
+    LTEXT           "Weather generator for BMS 4.36+.\r\n\r\nCreated by 'Ahmed'. <ahmedakbar@gmx.com>\r\n\r\nWeather data provided by NOAA.\r\n\r\nThis program uses the NOAA-EMC NCEPLIBS-g2c library.\r\n\r\n(c) Ahmed 2016-2026.",IDC_STATIC,128,32,120,90
     DEFPUSHBUTTON   "Close",IDOK,97,149,61,22
 END
 
