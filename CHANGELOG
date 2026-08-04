@@ -3,7 +3,7 @@ v2.2.0 (unreleased)
  * Fixed GRIB temperatures using ground/skin TMP instead of 2 m air temperature when both are present (e.g. GFS), which could show unrealistically high values
  * Fixed "Sync With Real Time" for BMS 4.35+ Zulu fmap loading (no longer applies theater timezone to sync; Initial Time / FMAP names are Zulu)
  * BMS Time status shows Zulu time
- * Renamed preview status "Current Time" to "Forecast Time"; display uses Zulu (Z) like BMS Time
+ * Renamed preview status "Current Time" to "Forecast Time"; display uses YYYY-MM-DD HH:MMZ (aligned with GFS picker)
  * Removed unused theater timezone from presets and Custom theater dialog; renamed sync option to "Sync With Real Time"
  * Default Initial Time hour is now 00Z (was 09)
  * NOAA download progress shows forecast Zulu timestamp with GFS step (e.g. f+3) instead of forecast hour number alone

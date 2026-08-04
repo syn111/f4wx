@@ -1713,9 +1713,9 @@ void f4wx::threaded_download_gfsrun_files(size_t idx)
 		if (run_tt != static_cast<std::time_t>(-1)) {
 			std::optional<std::tm> opt = gmtime_utc(run_tt + hour * 3600);
 			if (opt) {
-				// Same DD/MM/YY HH:MMZ format as main-window Forecast Time.
-				msg = std::format("Downloading {:02d}/{:02d}/{:02d} {:02d}:{:02d}Z (f+{})...",
-					opt->tm_mday, opt->tm_mon + 1, (opt->tm_year + 1900) % 100,
+				// Same YYYY-MM-DD HH:MMZ format as main-window Forecast Time / GFS picker.
+				msg = std::format("Downloading {:04d}-{:02d}-{:02d} {:02d}:{:02d}Z (f+{})...",
+					opt->tm_year + 1900, opt->tm_mon + 1, opt->tm_mday,
 					opt->tm_hour, opt->tm_min, hour);
 			}
 		}
@@ -2083,7 +2083,7 @@ void f4wx::ui_update_status_times()
 		// Forecast Time (GRIB validity, Zulu)
 		int day, mon, year, hr, min;
 		get_real_time(static_cast<int>(m_current_map_idx * m_converter_options.interval_minutes), year, mon, day, hr, min);
-		auto current_time_str = std::format(L"{:02d}/{:02d}/{:02d} {:02d}:{:02d}Z", day, mon, year % 100, hr, min);
+		auto current_time_str = std::format(L"{:04d}-{:02d}-{:02d} {:02d}:{:02d}Z", year, mon, day, hr, min);
 		SetWindowTextW(GetDlgItem(m_hwnd, IDC_F4WX_MAIN_CURRENT_TIME), current_time_str.c_str());
 
 		int bmsday, bmshr, bmsmin;
