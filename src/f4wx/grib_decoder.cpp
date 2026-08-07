@@ -130,14 +130,11 @@ int grib_field::param_id() const
 	int cat = static_cast<int>(m_gfld->ipdtmpl[0]);
 	int num = static_cast<int>(m_gfld->ipdtmpl[1]);
 	int base = param_id_from_grib2(disc, cat, num);
-	/* Temperature: 2 m AGL (preferred) or ground/skin (1/0) for legacy files without 2 m.
-	 * Preference when both are present is applied in grib_converter::add_grib. */
+	/* Temperature: 2 m AGL only (ignore ground/skin TMP). */
 	if (base == GRIB2_PARAM_2M_TEMP) {
-		int sfc = type_of_first_fixed_surface();
-		long lev = level();
-		if ((sfc != GRIB2_SFC_HEIGHT_ABOVE_GROUND || lev != GRIB2_LEVEL_2M)
-			&& (sfc != GRIB2_SFC_GROUND || lev != 0))
-			return 0;
+		if (type_of_first_fixed_surface() == GRIB2_SFC_HEIGHT_ABOVE_GROUND && level() == GRIB2_LEVEL_2M)
+			return GRIB2_PARAM_2M_TEMP;
+		return 0;
 	}
 	/* NCEP GFS uses (2,2)/(2,3) for both 10m wind and U/V at pressure levels; route by surface. */
 	if (base == GRIB2_PARAM_UGRD && num == 2) {
