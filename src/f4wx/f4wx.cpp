@@ -276,8 +276,9 @@ void f4wx::ui_slider_set_range(size_t range)
 
 ////////////////////////////////////////////////////////////////////////// UI stuff //////////////////////////////////////////////////////////////////////////
 
-/** Dialog small icon; loaded in WM_INITDIALOG, destroyed in WM_DESTROY to avoid leak. */
+/** Dialog icons; loaded in WM_INITDIALOG, destroyed in WM_DESTROY to avoid leak. */
 static HICON g_dialog_small_icon = nullptr;
+static HICON g_dialog_big_icon = nullptr;
 
 /** Tooltip windows created by create_tooltip; destroyed explicitly in WM_DESTROY. */
 static vector<HWND> g_tooltip_windows;
@@ -286,17 +287,29 @@ INT_PTR CALLBACK f4wx::dialog_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 {
 	switch (msg) {
 		case WM_INITDIALOG: {
-			// Set Icon (LoadImage result must be destroyed in WM_DESTROY)
+			// Set icons (LoadImage results must be destroyed in WM_DESTROY).
+			// ICON_BIG is used by the taskbar; without it Windows upscales ICON_SMALL and looks blurry.
+			HINSTANCE module = GetModuleHandle(nullptr);
 			if (g_dialog_small_icon != nullptr)
 				DestroyIcon(g_dialog_small_icon);
-			g_dialog_small_icon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
+			if (g_dialog_big_icon != nullptr)
+				DestroyIcon(g_dialog_big_icon);
+			g_dialog_small_icon = reinterpret_cast<HICON>(LoadImage(module,
 				MAKEINTRESOURCE(IDI_ICON1),
 				IMAGE_ICON,
 				GetSystemMetrics(SM_CXSMICON),
 				GetSystemMetrics(SM_CYSMICON),
 				0));
+			g_dialog_big_icon = reinterpret_cast<HICON>(LoadImage(module,
+				MAKEINTRESOURCE(IDI_ICON1),
+				IMAGE_ICON,
+				GetSystemMetrics(SM_CXICON),
+				GetSystemMetrics(SM_CYICON),
+				0));
 			if (g_dialog_small_icon != nullptr)
 				SendMessage(hwnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(g_dialog_small_icon));
+			if (g_dialog_big_icon != nullptr)
+				SendMessage(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(g_dialog_big_icon));
 
 			std::string title = std::format("F4Wx v{}{}{}", 
 				F4WX_VERSION_FULL,
@@ -332,6 +345,10 @@ INT_PTR CALLBACK f4wx::dialog_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 			if (g_dialog_small_icon != nullptr) {
 				DestroyIcon(g_dialog_small_icon);
 				g_dialog_small_icon = nullptr;
+			}
+			if (g_dialog_big_icon != nullptr) {
+				DestroyIcon(g_dialog_big_icon);
+				g_dialog_big_icon = nullptr;
 			}
 			for (HWND h : g_tooltip_windows) {
 				if (IsWindow(h))
